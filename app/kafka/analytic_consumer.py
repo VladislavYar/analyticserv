@@ -60,6 +60,5 @@ class AnalyticConsumer:
         event_type = EventTypeMap.get(data['event_type'], EventTypeMap[UNKNOWN])
         data['event_type'] = event_type
         async for session in get_clickhouse_async_session():
-            crud = self.CRUD_MAP[data.get('instance_name')]()
-            await crud.create(session, data)
-            await CRUDEvent().create(session, data)
+            await self.CRUD_MAP[data.get('instance_name')](session).create(data)
+            await CRUDEvent(session).create(data)

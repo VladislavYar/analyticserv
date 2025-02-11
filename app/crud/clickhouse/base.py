@@ -10,13 +10,20 @@ class CRUDBase:
 
     model: ClickhouseModel
 
-    async def create(self, session: AsyncSession, data: dict[str, Any]) -> None:
-        """Создание записи.
+    def __init__(self, session: AsyncSession) -> None:
+        """Инициализация CRUD модели.
 
         Args:
             session (AsyncSession): сессия ClickHouse.
+        """
+        self._session = session
+
+    async def create(self, data: dict[str, Any]) -> None:
+        """Создание записи.
+
+        Args:
             data (dict[str, Any]): данные для сохранения.
         """
         obj = self.model(**{key: value for key, value in data.items() if key in self.model.__dict__ and value})
-        session.add(obj)
-        await session.flush()
+        self._session.add(obj)
+        await self._session.flush()
